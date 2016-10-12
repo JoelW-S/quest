@@ -18,6 +18,7 @@ package com.joelws.simple.poller
 
 import com.github.drapostolos.rdp4j.DirectoryPoller
 import com.github.drapostolos.rdp4j.RegexFileFilter
+import com.joelws.simple.poller.handler.UnzipHandler
 import com.joelws.simple.poller.listener.ZipListener
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
@@ -47,7 +48,7 @@ class SftpPoller {
 
         val dp = DirectoryPoller.newBuilder()
                 .addPolledDirectory(polledDirectory)
-                .addListener(ZipListener(root, workingDir))
+                .addListener(ZipListener(root, workingDir, UnzipHandler()))
                 .setPollingInterval(15, TimeUnit.SECONDS)
                 .setDefaultFileFilter(RegexFileFilter(ZIP_SUFFIX))
                 .start()

@@ -29,7 +29,7 @@ object SftpSession {
     }
 
     fun getSession(host: String, userName: String, password: String): Session {
-        return this.factory.getSession(userName, host, 22).apply {
+        return this.factory.getSession(userName, host, SFTP_PORT).apply {
             setPassword(password)
             setConfig("StrictHostKeyChecking", "no")
         }

@@ -16,25 +16,10 @@ limitations under the License.
 
 package com.joelws.simple.poller
 
-import org.slf4j.LoggerFactory
+const val POLLING_INTERVAL = 15L
 
-class Application {
+const val SFTP_PORT = 22
 
-    companion object {
-        private val logger = LoggerFactory.getLogger(Application::class.java)
+const val TEMP_DIR = "tmp"
 
-        @JvmStatic
-        fun main(args: Array<String>) {
-            logger.info("Starting SFTP Poller")
-
-            try {
-                SftpPoller().bootstrap()
-            } catch (e: Exception) {
-                logger.error("Encountered error, Shutting down: ", e)
-                System.exit(1)
-            }
-        }
-
-    }
-
-}
+const val ZIP_SUFFIX = ".*\\.zip"

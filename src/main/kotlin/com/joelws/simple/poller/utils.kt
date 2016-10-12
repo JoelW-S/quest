@@ -13,28 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
 package com.joelws.simple.poller
 
-import org.slf4j.LoggerFactory
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
-class Application {
+fun executeIfMatches(str: String, execute: (matcher: Matcher) -> Unit) {
+    val pattern = Pattern.compile("(.*-)(\\d+)(.zip)")
+    val matcher = pattern.matcher(str)
 
-    companion object {
-        private val logger = LoggerFactory.getLogger(Application::class.java)
-
-        @JvmStatic
-        fun main(args: Array<String>) {
-            logger.info("Starting SFTP Poller")
-
-            try {
-                SftpPoller().bootstrap()
-            } catch (e: Exception) {
-                logger.error("Encountered error, Shutting down: ", e)
-                System.exit(1)
-            }
-        }
-
+    if (matcher.matches()) {
+        execute(matcher)
     }
-
 }
+

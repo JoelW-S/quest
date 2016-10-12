@@ -21,12 +21,16 @@ import com.github.drapostolos.rdp4j.FileAddedEvent
 import com.github.drapostolos.rdp4j.FileModifiedEvent
 import com.github.drapostolos.rdp4j.FileRemovedEvent
 import com.joelws.simple.poller.SftpOperation
+import com.joelws.simple.poller.handler.UnzipHandler
 import kotlinx.coroutines.async
 import org.slf4j.LoggerFactory
 
-class ZipListener(private val sftpOperation: SftpOperation, private val workingDir: String) : DirectoryListener {
+class ZipListener(private val sftpOperation: SftpOperation, private val workingDir: String, private val handler: UnzipHandler) : DirectoryListener {
 
-    private val logger = LoggerFactory.getLogger(ZipListener::class.java)
+    companion object {
+        const val TEMP_DIR = "tmp"
+        private val logger = LoggerFactory.getLogger(ZipListener::class.java)
+    }
 
     override fun fileModified(event: FileModifiedEvent) {
         logger.info(event.fileElement.name)
@@ -38,17 +42,25 @@ class ZipListener(private val sftpOperation: SftpOperation, private val workingD
 
     override fun fileAdded(event: FileAddedEvent) {
 
-        logger.info("File added: ${event.fileElement.name}")
+        val fileName = event.fileElement.name
+        logger.info("File added: $fileName")
 
-        val absoluteName = "$workingDir/${event.fileElement.name}"
+        val absoluteName = "$workingDir/$fileName"
+
+        val tempDirFileName = "$TEMP_DIR/$fileName"
 
         async<Unit> {
-            logger.info("Starting download of ${event.fileElement.name}")
+            logger.info("Starting download of $fileName to directory[$TEMP_DIR]")
 
-            await(sftpOperation.get(absoluteName, event.fileElement.name))
+            await(sftpOperation.get(absoluteName, tempDirFileName))
 
-            logger.info("Downloading of ${event.fileElement.name} is complete")
+            logger.info("Downloading of $fileName is complete")
+            handler.execute(tempDirFileName)
         }
+                .exceptionally { throwable ->
+                    logger.error("Download error: ", throwable.cause)
+                    throw throwable
+                }.get()
 
 
     }

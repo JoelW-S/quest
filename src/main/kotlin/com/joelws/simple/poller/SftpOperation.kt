@@ -18,9 +18,8 @@ package com.joelws.simple.poller
 
 import com.github.drapostolos.rdp4j.spi.FileElement
 import com.jcraft.jsch.ChannelSftp
-import com.jcraft.jsch.SftpException
+import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
@@ -45,18 +44,16 @@ class SftpOperation(private val details: SftpDetails,
         return CompletableFuture.supplyAsync {
             val channel = getChannel()
 
-            val fos = FileOutputStream(destFileName)
+            var fos: FileOutputStream? = null
 
             try {
-
+                File(destFileName).parentFile?.mkdir()
+                fos = FileOutputStream(destFileName)
                 channel.get(absoluteFileName, fos)
-
-            } catch (e: SftpException) {
-
-                throw IOException("Failed to perform write operation", e)
-
+            } catch (e: Exception) {
+                throw RuntimeException(e)
             } finally {
-                fos.close()
+                fos?.close()
                 channel.session.disconnect()
             }
         }

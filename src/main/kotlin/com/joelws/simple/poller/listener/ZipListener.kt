@@ -21,16 +21,18 @@ import com.github.drapostolos.rdp4j.FileAddedEvent
 import com.github.drapostolos.rdp4j.FileModifiedEvent
 import com.github.drapostolos.rdp4j.FileRemovedEvent
 import com.joelws.simple.poller.SftpOperation
+import com.joelws.simple.poller.TEMP_DIR
+import com.joelws.simple.poller.handler.MavenUploadHandler
 import com.joelws.simple.poller.handler.UnzipHandler
 import kotlinx.coroutines.async
 import org.slf4j.LoggerFactory
 
-class ZipListener(private val sftpOperation: SftpOperation, private val workingDir: String, private val handler: UnzipHandler) : DirectoryListener {
+class ZipListener(private val sftpOperation: SftpOperation,
+                  private val workingDir: String,
+                  private val zipHandler: UnzipHandler,
+                  private val mavenUploadHandler: MavenUploadHandler) : DirectoryListener {
 
-    companion object {
-        const val TEMP_DIR = "tmp"
-        private val logger = LoggerFactory.getLogger(ZipListener::class.java)
-    }
+    private val logger = LoggerFactory.getLogger(ZipListener::class.java)
 
     override fun fileModified(event: FileModifiedEvent) {
         logger.info(event.fileElement.name)
@@ -55,12 +57,14 @@ class ZipListener(private val sftpOperation: SftpOperation, private val workingD
             await(sftpOperation.get(absoluteName, tempDirFileName))
 
             logger.info("Downloading of $fileName is complete")
-            handler.execute(tempDirFileName)
+            zipHandler.execute(tempDirFileName)
         }
                 .exceptionally { throwable ->
                     logger.error("Download error: ", throwable.cause)
                     throw throwable
                 }.get()
+
+        mavenUploadHandler.execute(tempDirFileName)
 
 
     }

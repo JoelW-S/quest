@@ -18,34 +18,32 @@ package com.joelws.simple.poller.handler
 
 import com.joelws.simple.poller.TEMP_DIR
 import com.joelws.simple.poller.executeIfMatches
-import net.lingala.zip4j.core.ZipFile
 import org.slf4j.LoggerFactory
-import java.io.File
 
-class UnzipHandler() : Handler<String, Unit> {
+class MavenUploadHandler : Handler<String, Unit> {
 
 
-    private val logger = LoggerFactory.getLogger(UnzipHandler::class.java)
+    private val logger = LoggerFactory.getLogger(MavenUploadHandler::class.java)
 
 
     override fun execute(input: String) {
 
         executeIfMatches(input) { matcher ->
+
             val folderName = matcher.group(2)
 
-            val zip = ZipFile(File(input))
+            val proc = ProcessBuilder("$TEMP_DIR/$folderName/mvn_upload_$folderName.sh").start()
 
-            if (zip.isValidZipFile) {
-
-                logger.info("Unzipping ${zip.file.name}")
-
-                zip.extractAll(TEMP_DIR)
-
-                logger.info("Finished unzipping ${zip.file.name}")
-
-                File("$TEMP_DIR/$folderName/mvn_upload_$folderName.sh").setExecutable(true)
+            proc.inputStream.bufferedReader().forEachLine {
+                logger.info(it)
             }
+
+            val exitCode = proc.waitFor()
+
+            if (exitCode > 0) {
+                throw IllegalStateException("Upload failed and exited with $exitCode")
+            }
+
         }
     }
-
 }

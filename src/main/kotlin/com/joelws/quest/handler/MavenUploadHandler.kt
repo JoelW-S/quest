@@ -19,6 +19,7 @@ package com.joelws.quest.handler
 import com.joelws.quest.TEMP_DIR
 import com.joelws.quest.executeIfMatches
 import org.slf4j.LoggerFactory
+import java.io.File
 import java.util.concurrent.CompletableFuture
 
 class MavenUploadHandler : Handler<String, CompletableFuture<Unit>> {
@@ -33,22 +34,31 @@ class MavenUploadHandler : Handler<String, CompletableFuture<Unit>> {
 
                 val folderName = matcher.group(2)
 
-                logger.info("Executing mvn deploy script...")
 
-                val proc = ProcessBuilder("${TEMP_DIR}/$folderName/mvn_upload_$folderName.sh").start()
+                val mavenScriptPath = "$TEMP_DIR/$folderName/mvn_upload_$folderName.sh"
 
-                proc.inputStream.bufferedReader().forEachLine {
-                    logger.info(it)
+                val mavenScript = File(mavenScriptPath)
+
+                if (mavenScript.exists()) {
+                    logger.info("Executing mvn deploy script...")
+
+                    val proc = ProcessBuilder(mavenScriptPath).start()
+
+                    proc.inputStream.bufferedReader().forEachLine {
+                        logger.info(it)
+                    }
+
+                    val exitCode = proc.waitFor()
+
+                    logger.info("Finished executing mvn deploy script...")
+
+                    if (exitCode > 0) {
+                        throw IllegalStateException("Upload failed and exited with $exitCode")
+                    }
+
+                } else {
+                    logger.info("Can't find maven script, skipping..")
                 }
-
-                val exitCode = proc.waitFor()
-
-                logger.info("Finished executing mvn deploy script...")
-
-                if (exitCode > 0) {
-                    throw IllegalStateException("Upload failed and exited with $exitCode")
-                }
-
             }
         }
     }

@@ -68,7 +68,6 @@ class ZipListener(private val sftpOperation: SftpOperation,
         }
                 .exceptionally { throwable ->
                     logger.error("Encountered error: ", throwable)
-                    throw throwable
                 }.get()
 
 

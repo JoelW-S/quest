@@ -19,6 +19,7 @@ package com.joelws.quest.handler
 import com.joelws.quest.TEMP_DIR
 import com.joelws.quest.executeIfMatches
 import net.lingala.zip4j.core.ZipFile
+import net.lingala.zip4j.exception.ZipException
 import org.slf4j.LoggerFactory
 import java.io.File
 
@@ -33,19 +34,30 @@ class UnzipHandler() : Handler<String, Unit> {
         executeIfMatches(input) { matcher ->
             val folderName = matcher.group(2)
 
-            val zip = ZipFile(File(input))
+            val file = File(input)
+            val zip = ZipFile(file)
 
             if (zip.isValidZipFile) {
+                try {
+                    logger.info("Unzipping ${zip.file.name}")
 
-                logger.info("Unzipping ${zip.file.name}")
+                    zip.extractAll(TEMP_DIR)
 
-                zip.extractAll(TEMP_DIR)
+                    logger.info("Finished unzipping ${zip.file.name}")
 
-                logger.info("Finished unzipping ${zip.file.name}")
+                    File("$TEMP_DIR/$folderName/mvn_upload_$folderName.sh").setExecutable(true)
 
-                File("${TEMP_DIR}/$folderName/mvn_upload_$folderName.sh").setExecutable(true)
+                } catch (e: ZipException) {
+
+                    logger.error("Unzip error: ", e)
+
+                } finally {
+
+                    logger.debug("Cleaning up: removing ${file.name}")
+                    file.deleteRecursively()
+
+                }
             }
         }
     }
-
 }

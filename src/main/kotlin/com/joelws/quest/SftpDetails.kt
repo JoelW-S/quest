@@ -14,6 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.joelws.simple.poller
+package com.joelws.quest
 
 data class SftpDetails(val host: String, val userName: String, val password: String)

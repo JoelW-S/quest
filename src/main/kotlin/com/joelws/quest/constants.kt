@@ -14,9 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.joelws.simple.poller.handler
+package com.joelws.quest
 
-interface Handler<in T, out R> {
+const val POLLING_INTERVAL = 15L
 
-    fun execute(input: T): R
-}
+const val SFTP_PORT = 22
+
+const val TEMP_DIR = "tmp"
+
+const val ZIP_SUFFIX = ".*\\.zip"

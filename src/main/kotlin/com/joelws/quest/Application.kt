@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.joelws.simple.poller
+package com.joelws.quest
 
 import org.slf4j.LoggerFactory
 
@@ -25,7 +25,7 @@ class Application {
 
         @JvmStatic
         fun main(args: Array<String>) {
-            logger.info("Starting SFTP Poller")
+            logger.info("Starting quest")
 
             try {
                 SftpPoller().bootstrap()

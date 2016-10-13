@@ -14,16 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.joelws.simple.poller.listener
+package com.joelws.quest.listener
 
 import com.github.drapostolos.rdp4j.DirectoryListener
 import com.github.drapostolos.rdp4j.FileAddedEvent
 import com.github.drapostolos.rdp4j.FileModifiedEvent
 import com.github.drapostolos.rdp4j.FileRemovedEvent
-import com.joelws.simple.poller.SftpOperation
-import com.joelws.simple.poller.TEMP_DIR
-import com.joelws.simple.poller.handler.MavenUploadHandler
-import com.joelws.simple.poller.handler.UnzipHandler
+import com.joelws.quest.SftpOperation
+import com.joelws.quest.TEMP_DIR
+import com.joelws.quest.handler.MavenUploadHandler
+import com.joelws.quest.handler.UnzipHandler
 import kotlinx.coroutines.async
 import org.slf4j.LoggerFactory
 
@@ -35,17 +35,20 @@ class ZipListener(private val sftpOperation: SftpOperation,
     private val logger = LoggerFactory.getLogger(ZipListener::class.java)
 
     override fun fileModified(event: FileModifiedEvent) {
-        logger.info(event.fileElement.name)
+
     }
 
     override fun fileRemoved(event: FileRemovedEvent) {
-        logger.info("File removed: ${event.fileElement.name}")
+
     }
 
     override fun fileAdded(event: FileAddedEvent) {
 
+        logger.info("We decide to go down a different path...")
+
         val fileName = event.fileElement.name
-        logger.info("File added: $fileName")
+
+        logger.info("Found a file on the way: $fileName")
 
         val absoluteName = "$workingDir/$fileName"
 

@@ -16,7 +16,7 @@ buildscript {
 
 apply plugin: 'kotlin'
 apply plugin: 'application'
-mainClassName = "com.joelws.simple.poller.Application"
+mainClassName = "Application"
 jar {
     manifest {
         attributes "Main-Class": "$mainClassName"

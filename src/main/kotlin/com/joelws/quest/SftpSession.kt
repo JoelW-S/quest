@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.joelws.simple.poller
+package com.joelws.quest
 
 import com.jcraft.jsch.ChannelSftp
 import com.jcraft.jsch.JSch

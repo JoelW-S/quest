@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.joelws.simple.poller
+package com.joelws.quest
 
 import com.github.drapostolos.rdp4j.spi.FileElement
 import com.jcraft.jsch.ChannelSftp

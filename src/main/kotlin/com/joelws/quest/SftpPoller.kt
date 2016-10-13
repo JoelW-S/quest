@@ -14,13 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.joelws.simple.poller
+package com.joelws.quest
 
 import com.github.drapostolos.rdp4j.DirectoryPoller
 import com.github.drapostolos.rdp4j.RegexFileFilter
-import com.joelws.simple.poller.handler.MavenUploadHandler
-import com.joelws.simple.poller.handler.UnzipHandler
-import com.joelws.simple.poller.listener.ZipListener
+import com.joelws.quest.handler.MavenUploadHandler
+import com.joelws.quest.handler.UnzipHandler
+import com.joelws.quest.listener.ZipListener
 import java.util.concurrent.TimeUnit
 
 class SftpPoller {

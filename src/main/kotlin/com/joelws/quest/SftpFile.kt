@@ -14,12 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.joelws.simple.poller
+package com.joelws.quest
 
 import com.github.drapostolos.rdp4j.spi.FileElement
-import com.jcraft.jsch.ChannelSftp
+import com.jcraft.jsch.ChannelSftp.LsEntry
 
-class SftpFile(private val lsEntry: ChannelSftp.LsEntry) : FileElement {
+class SftpFile(private val lsEntry: LsEntry) : FileElement {
 
     override fun isDirectory(): Boolean = lsEntry.attrs.isDir
 

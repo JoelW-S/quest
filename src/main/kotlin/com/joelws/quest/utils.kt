@@ -13,13 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+package com.joelws.quest
 
-package com.joelws.simple.poller
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
-const val POLLING_INTERVAL = 15L
+fun executeIfMatches(str: String, execute: (matcher: Matcher) -> Unit) {
+    val pattern = Pattern.compile("(.*-)(\\d+)(.zip)")
+    val matcher = pattern.matcher(str)
 
-const val SFTP_PORT = 22
+    if (matcher.matches()) {
+        execute(matcher)
+    }
+}
 
-const val TEMP_DIR = "tmp"
-
-const val ZIP_SUFFIX = ".*\\.zip"

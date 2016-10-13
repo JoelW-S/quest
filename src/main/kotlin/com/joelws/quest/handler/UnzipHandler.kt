@@ -14,10 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.joelws.simple.poller.handler
+package com.joelws.quest.handler
 
-import com.joelws.simple.poller.TEMP_DIR
-import com.joelws.simple.poller.executeIfMatches
+import com.joelws.quest.TEMP_DIR
+import com.joelws.quest.executeIfMatches
 import net.lingala.zip4j.core.ZipFile
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -43,7 +43,7 @@ class UnzipHandler() : Handler<String, Unit> {
 
                 logger.info("Finished unzipping ${zip.file.name}")
 
-                File("$TEMP_DIR/$folderName/mvn_upload_$folderName.sh").setExecutable(true)
+                File("${TEMP_DIR}/$folderName/mvn_upload_$folderName.sh").setExecutable(true)
             }
         }
     }

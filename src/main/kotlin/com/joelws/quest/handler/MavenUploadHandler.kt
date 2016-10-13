@@ -14,10 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.joelws.simple.poller.handler
+package com.joelws.quest.handler
 
-import com.joelws.simple.poller.TEMP_DIR
-import com.joelws.simple.poller.executeIfMatches
+import com.joelws.quest.TEMP_DIR
+import com.joelws.quest.executeIfMatches
 import org.slf4j.LoggerFactory
 import java.util.concurrent.CompletableFuture
 
@@ -35,7 +35,7 @@ class MavenUploadHandler : Handler<String, CompletableFuture<Unit>> {
 
                 logger.info("Executing mvn deploy script...")
 
-                val proc = ProcessBuilder("$TEMP_DIR/$folderName/mvn_upload_$folderName.sh").start()
+                val proc = ProcessBuilder("${TEMP_DIR}/$folderName/mvn_upload_$folderName.sh").start()
 
                 proc.inputStream.bufferedReader().forEachLine {
                     logger.info(it)

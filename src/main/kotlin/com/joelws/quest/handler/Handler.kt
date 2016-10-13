@@ -13,17 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package com.joelws.simple.poller
 
-import java.util.regex.Matcher
-import java.util.regex.Pattern
+package com.joelws.quest.handler
 
-fun executeIfMatches(str: String, execute: (matcher: Matcher) -> Unit) {
-    val pattern = Pattern.compile("(.*-)(\\d+)(.zip)")
-    val matcher = pattern.matcher(str)
+interface Handler<in T, out R> {
 
-    if (matcher.matches()) {
-        execute(matcher)
-    }
+    fun execute(input: T): R
 }
-

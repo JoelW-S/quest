@@ -20,6 +20,7 @@ import com.github.drapostolos.rdp4j.spi.FileElement
 import com.jcraft.jsch.ChannelSftp
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
@@ -50,7 +51,7 @@ class SftpOperation(private val details: SftpDetails,
                 File(destFileName).parentFile?.mkdir()
                 fos = FileOutputStream(destFileName)
                 channel.get(absoluteFileName, fos)
-            } catch (e: Exception) {
+            } catch (e: IOException) {
                 throw RuntimeException(e)
             } finally {
                 fos?.close()

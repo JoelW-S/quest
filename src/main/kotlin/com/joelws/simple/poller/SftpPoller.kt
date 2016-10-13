@@ -41,17 +41,12 @@ class SftpPoller {
 
         val polledDirectory = SftpDirectory(root, workingDir)
 
-        val dp = DirectoryPoller.newBuilder()
+        DirectoryPoller.newBuilder()
                 .addPolledDirectory(polledDirectory)
                 .addListener(ZipListener(root, workingDir, UnzipHandler(), MavenUploadHandler()))
                 .setPollingInterval(POLLING_INTERVAL, TimeUnit.SECONDS)
                 .setDefaultFileFilter(RegexFileFilter(ZIP_SUFFIX))
                 .start()
-
-        // TimeUnit.MINUTES.sleep()
-
-        // dp.stop()
-
     }
 
     private fun getEnvVar(envVar: String): String {

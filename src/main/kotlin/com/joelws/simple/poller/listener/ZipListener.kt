@@ -57,14 +57,16 @@ class ZipListener(private val sftpOperation: SftpOperation,
             await(sftpOperation.get(absoluteName, tempDirFileName))
 
             logger.info("Downloading of $fileName is complete")
+
             zipHandler.execute(tempDirFileName)
+
+            await(mavenUploadHandler.execute(tempDirFileName))
+
         }
                 .exceptionally { throwable ->
-                    logger.error("Download error: ", throwable.cause)
+                    logger.error("Encountered error: ", throwable)
                     throw throwable
                 }.get()
-
-        mavenUploadHandler.execute(tempDirFileName)
 
 
     }

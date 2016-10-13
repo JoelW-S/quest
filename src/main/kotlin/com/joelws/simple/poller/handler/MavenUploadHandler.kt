@@ -19,31 +19,37 @@ package com.joelws.simple.poller.handler
 import com.joelws.simple.poller.TEMP_DIR
 import com.joelws.simple.poller.executeIfMatches
 import org.slf4j.LoggerFactory
+import java.util.concurrent.CompletableFuture
 
-class MavenUploadHandler : Handler<String, Unit> {
+class MavenUploadHandler : Handler<String, CompletableFuture<Unit>> {
 
 
     private val logger = LoggerFactory.getLogger(MavenUploadHandler::class.java)
 
 
-    override fun execute(input: String) {
+    override fun execute(input: String): CompletableFuture<Unit> {
+        return CompletableFuture.supplyAsync {
+            executeIfMatches(input) { matcher ->
 
-        executeIfMatches(input) { matcher ->
+                val folderName = matcher.group(2)
 
-            val folderName = matcher.group(2)
+                logger.info("Executing mvn deploy script...")
 
-            val proc = ProcessBuilder("$TEMP_DIR/$folderName/mvn_upload_$folderName.sh").start()
+                val proc = ProcessBuilder("$TEMP_DIR/$folderName/mvn_upload_$folderName.sh").start()
 
-            proc.inputStream.bufferedReader().forEachLine {
-                logger.info(it)
+                proc.inputStream.bufferedReader().forEachLine {
+                    logger.info(it)
+                }
+
+                val exitCode = proc.waitFor()
+
+                logger.info("Finished executing mvn deploy script...")
+
+                if (exitCode > 0) {
+                    throw IllegalStateException("Upload failed and exited with $exitCode")
+                }
+
             }
-
-            val exitCode = proc.waitFor()
-
-            if (exitCode > 0) {
-                throw IllegalStateException("Upload failed and exited with $exitCode")
-            }
-
         }
     }
 }

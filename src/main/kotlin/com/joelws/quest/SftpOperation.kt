@@ -34,7 +34,7 @@ class SftpOperation(private val details: SftpDetails,
 
             @Suppress("UNCHECKED_CAST")
             val listOfFiles = channel.ls(workingDirectory) as Vector<ChannelSftp.LsEntry>
-            return listOfFiles.map { SftpFile(it) }.toSet()
+            return listOfFiles.map(::SftpFile).toSet()
 
         } finally {
             channel.session.disconnect()

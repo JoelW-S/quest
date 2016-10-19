@@ -18,6 +18,7 @@ package com.joelws.quest
 
 import com.github.drapostolos.rdp4j.spi.FileElement
 import com.jcraft.jsch.ChannelSftp
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -27,6 +28,7 @@ import java.util.concurrent.CompletableFuture
 class SftpOperation(private val details: SftpDetails,
                     private val sftpSession: SftpSession = SftpSession) {
 
+    private val logger = LoggerFactory.getLogger(SftpOperation::class.java)
 
     fun listFiles(workingDirectory: String): Set<FileElement> {
         val channel = getChannel()
@@ -52,7 +54,7 @@ class SftpOperation(private val details: SftpDetails,
                 fos = FileOutputStream(destFileName)
                 channel.get(absoluteFileName, fos)
             } catch (e: IOException) {
-                throw RuntimeException(e)
+                logger.error("Failed to write file: ", e)
             } finally {
                 fos?.close()
                 channel.session.disconnect()

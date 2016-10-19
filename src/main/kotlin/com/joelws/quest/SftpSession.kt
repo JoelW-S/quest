@@ -31,7 +31,7 @@ object SftpSession {
     fun getSession(host: String, userName: String, password: String): Session {
         return this.factory.getSession(userName, host, SFTP_PORT).apply {
             setPassword(password)
-            setConfig("StrictHostKeyChecking", "no")
+            setConfig(HOST_CHECKING_KEY, HOST_CHECKING_VALUE)
         }
 
     }
@@ -40,7 +40,7 @@ object SftpSession {
 
         session.connect()
 
-        val channel = session.openChannel("sftp")
+        val channel = session.openChannel(CHANNEL_TYPE)
 
         channel.connect()
 

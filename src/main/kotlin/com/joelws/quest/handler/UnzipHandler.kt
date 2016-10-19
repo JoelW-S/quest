@@ -17,7 +17,6 @@ limitations under the License.
 package com.joelws.quest.handler
 
 import com.joelws.quest.TEMP_DIR
-import com.joelws.quest.executeIfMatches
 import net.lingala.zip4j.core.ZipFile
 import net.lingala.zip4j.exception.ZipException
 import org.slf4j.LoggerFactory
@@ -31,32 +30,27 @@ class UnzipHandler() : Handler<String, Unit> {
 
     override fun execute(input: String) {
 
-        executeIfMatches(input) { matcher ->
-            val folderName = matcher.group(2)
 
-            val file = File(input)
-            val zip = ZipFile(file)
+        val file = File(input)
+        val zip = ZipFile(file)
 
-            if (zip.isValidZipFile) {
-                try {
-                    logger.info("Unzipping ${zip.file.name}")
+        if (zip.isValidZipFile) {
+            try {
+                logger.info("Unzipping ${zip.file.name}")
 
-                    zip.extractAll(TEMP_DIR)
+                zip.extractAll(TEMP_DIR)
 
-                    logger.info("Finished unzipping ${zip.file.name}")
+                logger.info("Finished unzipping ${zip.file.name}")
 
-                    File("$TEMP_DIR/$folderName/mvn_upload_$folderName.sh").setExecutable(true)
+            } catch (e: ZipException) {
 
-                } catch (e: ZipException) {
+                logger.error("Failed to unzip file: ", e)
 
-                    logger.error("Unzip error: ", e)
+            } finally {
 
-                } finally {
+                logger.debug("Cleaning up: removing ${file.name}")
+                file.deleteRecursively()
 
-                    logger.debug("Cleaning up: removing ${file.name}")
-                    file.deleteRecursively()
-
-                }
             }
         }
     }

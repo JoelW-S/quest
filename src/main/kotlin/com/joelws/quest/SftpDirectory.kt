@@ -33,11 +33,11 @@ class SftpDirectory(private val sftpOperation: SftpOperation, private val workin
             sftpOperation.listFiles(workingDirectory)
 
         } catch (e: JSchException) {
-            logger.error("Something went wrong: ", e)
+            logger.error("SSH error: ", e)
             emptySet<FileElement>()
 
         } catch(e: SftpException) {
-            logger.error("Something went wrong: ", e)
+            logger.error("SFTP error: ", e)
             emptySet<FileElement>()
         }
     }

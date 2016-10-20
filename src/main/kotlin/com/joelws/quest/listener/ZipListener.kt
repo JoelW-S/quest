@@ -25,7 +25,7 @@ import com.joelws.quest.TEMP_DIR
 import com.joelws.quest.handler.MavenUploadHandler
 import com.joelws.quest.handler.UnzipHandler
 import org.slf4j.LoggerFactory
-import rx.lang.kotlin.observable
+import rx.lang.kotlin.single
 
 class ZipListener(private val sftpOperation: SftpOperation,
                   private val workingDir: String,
@@ -54,7 +54,7 @@ class ZipListener(private val sftpOperation: SftpOperation,
 
         val tempDirFileName = "$TEMP_DIR/$fileName"
 
-        val mavenUploadSubscription = observable<Unit> {
+        val mavenUploadSubscription = single<Unit> {
             logger.info("Starting download of $fileName to directory[$TEMP_DIR]")
 
             sftpOperation.get(absoluteName, tempDirFileName)
@@ -66,9 +66,8 @@ class ZipListener(private val sftpOperation: SftpOperation,
             mavenUploadHandler.execute(tempDirFileName)
 
         }.subscribe(
-                { },
-                { e -> logger.error("Task encountered error: ", e) },
-                { logger.info("Task completed, continuing...") }
+                { logger.info("Task completed, continuing...") },
+                { e -> logger.error("Task encountered error: ", e) }
         )
 
         if (!mavenUploadSubscription.isUnsubscribed) {

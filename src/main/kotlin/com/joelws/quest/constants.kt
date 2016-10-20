@@ -18,6 +18,12 @@ package com.joelws.quest
 
 const val POLLING_INTERVAL = 15L
 
+const val HOST_CHECKING_KEY = "StrictHostKeyChecking"
+
+const val HOST_CHECKING_VALUE = "no"
+
+const val CHANNEL_TYPE = "sftp"
+
 const val SFTP_PORT = 22
 
 const val TEMP_DIR = "tmp"

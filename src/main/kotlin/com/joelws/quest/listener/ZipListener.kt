@@ -26,6 +26,7 @@ import com.joelws.quest.handler.MavenUploadHandler
 import com.joelws.quest.handler.UnzipHandler
 import org.slf4j.LoggerFactory
 import rx.lang.kotlin.single
+import rx.schedulers.Schedulers
 
 class ZipListener(private val sftpOperation: SftpOperation,
                   private val workingDir: String,
@@ -65,14 +66,11 @@ class ZipListener(private val sftpOperation: SftpOperation,
 
             mavenUploadHandler.execute(tempDirFileName)
 
-        }.subscribe(
+        }.subscribeOn(Schedulers.io()).subscribe(
                 { logger.info("Task completed, continuing...") },
                 { e -> logger.error("Task encountered error: ", e) }
         )
 
-        if (!mavenUploadSubscription.isUnsubscribed) {
-            mavenUploadSubscription.unsubscribe()
-        }
 
 
     }

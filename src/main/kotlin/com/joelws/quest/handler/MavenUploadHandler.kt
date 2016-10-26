@@ -19,55 +19,61 @@ package com.joelws.quest.handler
 import com.joelws.quest.TEMP_DIR
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.util.concurrent.CompletableFuture
+import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-class MavenUploadHandler : Handler<String, CompletableFuture<Unit>> {
+object MavenUploadHandler : Handler<String, Unit> {
 
 
     private val logger = LoggerFactory.getLogger(MavenUploadHandler::class.java)
 
 
-    override fun execute(input: String): CompletableFuture<Unit> {
-        return CompletableFuture.supplyAsync {
+    override fun execute(input: String) {
 
-            val pattern = Pattern.compile("(.*-)(\\d+)(.zip)")
-            val matcher = pattern.matcher(input)
+        val pattern = Pattern.compile("(.*-)(\\d+)(.zip)")
+        val matcher = pattern.matcher(input)
 
-            if (matcher.matches()) {
+        makeExecutableAndRun(matcher)
 
-                val folderName = matcher.group(2)
+    }
 
+    private fun makeExecutableAndRun(matcher: Matcher) {
+        if (matcher.matches()) {
+            val folderName = matcher.group(2)
 
-                val mavenScriptPath = "$TEMP_DIR/$folderName/mvn_upload_$folderName.sh"
+            val mavenScriptPath = "$TEMP_DIR/$folderName/mvn_upload_$folderName.sh"
 
-                val mavenScript = File(mavenScriptPath)
+            val mavenScript = File(mavenScriptPath)
 
+            if (mavenScript.exists()) {
                 mavenScript.setExecutable(true)
-
-                if (mavenScript.exists()) {
-                    logger.info("Executing mvn deploy script...")
-
-                    val proc = ProcessBuilder(mavenScriptPath).start()
-
-                    proc.inputStream.bufferedReader().forEachLine { line ->
-                        logger.info(line)
-                    }
-
-                    val exitCode = proc.waitFor()
-
-                    logger.info("Finished executing mvn deploy script...")
-
-                    if (exitCode > 0) {
-                        logger.error("Upload failed and exited with $exitCode")
-                    }
-
-                } else {
-                    logger.info("Can't find maven script, skipping..")
-                }
+                executeScript(mavenScriptPath)
             } else {
-                logger.warn("File is not a valid artefact zip, skipping...")
+                logger.info("Can't find maven script, skipping..")
             }
+        } else {
+            logger.warn("File is not a valid artefact zip, skipping...")
         }
     }
+
+    private fun executeScript(scriptPath: String) {
+        logger.info("Executing mvn deploy script...")
+
+        val proc = ProcessBuilder(scriptPath).start()
+
+        proc.inputStream.bufferedReader().forEachLine { line ->
+            logger.info(line)
+        }
+
+        val exitCode = proc.waitFor()
+
+        logger.info("Finished executing mvn deploy script...")
+
+        if (exitCode > 0) {
+            logger.error("Upload failed and exited with $exitCode")
+        }
+    }
+
 }
+
+

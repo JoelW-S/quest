@@ -23,7 +23,7 @@ import com.joelws.quest.handler.UnzipHandler
 import com.joelws.quest.listener.ZipListener
 import java.util.concurrent.TimeUnit
 
-class SftpPoller {
+object SftpPoller {
 
     fun bootstrap() {
 
@@ -43,7 +43,7 @@ class SftpPoller {
 
         DirectoryPoller.newBuilder()
                 .addPolledDirectory(polledDirectory)
-                .addListener(ZipListener(root, workingDir, UnzipHandler(), MavenUploadHandler()))
+                .addListener(ZipListener(root, workingDir, UnzipHandler, MavenUploadHandler))
                 .setPollingInterval(POLLING_INTERVAL, TimeUnit.SECONDS)
                 .setDefaultFileFilter(RegexFileFilter(ZIP_SUFFIX))
                 .start()

@@ -23,7 +23,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
-import java.util.concurrent.CompletableFuture
 
 class SftpOperation(private val details: SftpDetails,
                     private val sftpSession: SftpSession = SftpSession) {
@@ -36,30 +35,30 @@ class SftpOperation(private val details: SftpDetails,
 
             @Suppress("UNCHECKED_CAST")
             val listOfFiles = channel.ls(workingDirectory) as Vector<ChannelSftp.LsEntry>
-            return listOfFiles.map(::SftpFile).toSet()
+            return listOfFiles.map { SftpFile(it) }.toSet()
 
         } finally {
             channel.session.disconnect()
         }
     }
 
-    fun get(absoluteFileName: String, destFileName: String): CompletableFuture<Unit> {
-        return CompletableFuture.supplyAsync {
-            val channel = getChannel()
+    fun get(absoluteFileName: String, destFileName: String) {
 
-            var fos: FileOutputStream? = null
+        val channel = getChannel()
 
-            try {
-                File(destFileName).parentFile?.mkdir()
-                fos = FileOutputStream(destFileName)
-                channel.get(absoluteFileName, fos)
-            } catch (e: IOException) {
-                logger.error("Failed to write file: ", e)
-            } finally {
-                fos?.close()
-                channel.session.disconnect()
-            }
+        var fos: FileOutputStream? = null
+
+        try {
+            File(destFileName).parentFile?.mkdir()
+            fos = FileOutputStream(destFileName)
+            channel.get(absoluteFileName, fos)
+        } catch (e: IOException) {
+            logger.error("Failed to write file: ", e)
+        } finally {
+            fos?.close()
+            channel.session.disconnect()
         }
+
     }
 
     private fun getChannel(): ChannelSftp {

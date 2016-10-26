@@ -22,7 +22,7 @@ import net.lingala.zip4j.exception.ZipException
 import org.slf4j.LoggerFactory
 import java.io.File
 
-class UnzipHandler() : Handler<String, Unit> {
+object UnzipHandler : Handler<String, Unit> {
 
 
     private val logger = LoggerFactory.getLogger(UnzipHandler::class.java)

@@ -24,8 +24,9 @@ import com.joelws.quest.SftpOperation
 import com.joelws.quest.TEMP_DIR
 import com.joelws.quest.handler.MavenUploadHandler
 import com.joelws.quest.handler.UnzipHandler
-import kotlinx.coroutines.async
 import org.slf4j.LoggerFactory
+import rx.lang.kotlin.single
+import rx.schedulers.Schedulers
 
 class ZipListener(private val sftpOperation: SftpOperation,
                   private val workingDir: String,
@@ -54,21 +55,22 @@ class ZipListener(private val sftpOperation: SftpOperation,
 
         val tempDirFileName = "$TEMP_DIR/$fileName"
 
-        async<Unit> {
+        val mavenUploadSubscription = single<Unit> {
             logger.info("Starting download of $fileName to directory[$TEMP_DIR]")
 
-            await(sftpOperation.get(absoluteName, tempDirFileName))
+            sftpOperation.get(absoluteName, tempDirFileName)
 
             logger.info("Downloading of $fileName is complete")
 
             zipHandler.execute(tempDirFileName)
 
-            await(mavenUploadHandler.execute(tempDirFileName))
+            mavenUploadHandler.execute(tempDirFileName)
 
-        }
-                .exceptionally { throwable ->
-                    logger.error("Encountered error: ", throwable)
-                }.get()
+        }.subscribeOn(Schedulers.io()).subscribe(
+                { logger.info("Task completed, continuing...") },
+                { e -> logger.error("Task encountered error: ", e) }
+        )
+
 
 
     }

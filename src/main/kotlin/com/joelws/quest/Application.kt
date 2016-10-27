@@ -18,23 +18,20 @@ package com.joelws.quest
 
 import org.slf4j.LoggerFactory
 
-class Application {
+object Application {
 
-    companion object {
-        private val logger = LoggerFactory.getLogger(Application::class.java)
+    private val logger = LoggerFactory.getLogger(Application::class.java)
 
-        @JvmStatic
-        fun main(args: Array<String>) {
-            logger.info("Starting quest")
+    @JvmStatic
+    fun main(args: Array<String>) {
+        logger.info("Starting quest")
 
-            try {
-                SftpPoller.bootstrap()
-            } catch (e: Exception) {
-                logger.error("Encountered error, Shutting down: ", e)
-                System.exit(1)
-            }
+        try {
+            SftpPoller.bootstrap()
+        } catch (e: Exception) {
+            logger.error("Encountered error, Shutting down: ", e)
+            System.exit(1)
         }
-
     }
 
 }

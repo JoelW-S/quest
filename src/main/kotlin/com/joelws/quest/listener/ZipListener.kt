@@ -47,7 +47,7 @@ class ZipListener(private val sftpOperation: SftpOperation,
 
         logger.info("We decide to go down a different path...")
 
-        val fileName = event.fileElement.name
+        val fileName = event.fileElement.name.removeSuffix(".antivirus.scanning")
 
         logger.info("Found a file on the way: $fileName")
 
@@ -70,7 +70,6 @@ class ZipListener(private val sftpOperation: SftpOperation,
                 { logger.info("Task completed, continuing...") },
                 { e -> logger.error("Task encountered error: ", e) }
         )
-
 
 
     }

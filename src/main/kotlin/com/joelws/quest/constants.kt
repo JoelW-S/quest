@@ -28,4 +28,6 @@ const val SFTP_PORT = 22
 
 const val TEMP_DIR = "tmp"
 
-const val ZIP_SUFFIX = ".*\\.zip.antivirus.scanning"
+const val VALID_ZIP = "(HTS_.+)(.zip)"
+
+const val ZIP_SUFFIX = "$VALID_ZIP(.antivirus.scanning)"

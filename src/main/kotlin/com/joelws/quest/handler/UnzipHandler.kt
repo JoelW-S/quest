@@ -35,6 +35,7 @@ object UnzipHandler : Handler<String, Unit> {
         val zip = ZipFile(file)
 
         if (zip.isValidZipFile) {
+
             try {
                 logger.info("Unzipping ${zip.file.name}")
 
@@ -49,6 +50,7 @@ object UnzipHandler : Handler<String, Unit> {
             } finally {
 
                 logger.debug("Cleaning up: removing ${file.name}")
+
                 file.deleteRecursively()
 
             }

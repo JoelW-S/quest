@@ -17,53 +17,62 @@ limitations under the License.
 package com.joelws.quest.handler
 
 import com.joelws.quest.TEMP_DIR
+import com.joelws.quest.VALID_ZIP
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-object MavenUploadHandler : Handler<String, Unit> {
+object MavenUploadHandler : Handler<String, Boolean> {
 
 
     private val logger = LoggerFactory.getLogger(MavenUploadHandler::class.java)
 
 
-    override fun execute(input: String) {
+    override fun execute(input: String): Boolean {
 
-        val pattern = Pattern.compile("(.*-)(\\d+)(.zip)")
+        val pattern = Pattern.compile(VALID_ZIP)
         val matcher = pattern.matcher(input)
 
-        makeExecutableAndRun(matcher)
+        return makeExecutableAndRun(matcher)
 
     }
 
-    private fun makeExecutableAndRun(matcher: Matcher) {
+    private fun makeExecutableAndRun(matcher: Matcher): Boolean {
         if (matcher.matches()) {
-            val folderName = matcher.group(2)
+            val folderName = matcher.group(1)
 
-            val mavenScriptPath = "$TEMP_DIR/$folderName/mvn_upload_$folderName.sh"
+            val mavenScriptPath = "${TEMP_DIR}${File::separator}$folderName${File::separator}mvn_upload_$folderName.sh"
 
             val mavenScript = File(mavenScriptPath)
 
             if (mavenScript.exists()) {
+
                 mavenScript.setExecutable(true)
-                executeScript(mavenScriptPath)
+
+                return executeScript(mavenScriptPath)
+
             } else {
-                logger.info("Can't find maven script, skipping..")
+                logger.warn("Can't find maven script, skipping..")
             }
         } else {
             logger.warn("File is not a valid artefact zip, skipping...")
         }
+        return false
     }
 
-    private fun executeScript(scriptPath: String) {
+    private fun executeScript(scriptPath: String): Boolean {
+
         logger.info("Executing mvn deploy script...")
 
         val proc = ProcessBuilder(scriptPath).start()
 
-        proc.inputStream.bufferedReader().forEachLine { line ->
-            logger.info(line)
-        }
+        proc
+                .inputStream
+                .bufferedReader()
+                .forEachLine { line ->
+                    logger.info(line)
+                }
 
         val exitCode = proc.waitFor()
 
@@ -71,7 +80,9 @@ object MavenUploadHandler : Handler<String, Unit> {
 
         if (exitCode > 0) {
             logger.error("Upload failed and exited with $exitCode")
+            return false
         }
+        return true
     }
 
 }

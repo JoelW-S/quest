@@ -29,10 +29,12 @@ object SftpSession {
     }
 
     fun getSession(host: String, userName: String, password: String): Session {
-        return this.factory.getSession(userName, host, SFTP_PORT).apply {
-            setPassword(password)
-            setConfig(HOST_CHECKING_KEY, HOST_CHECKING_VALUE)
-        }
+        return this.factory
+                .getSession(userName, host, SFTP_PORT)
+                .apply {
+                    setPassword(password)
+                    setConfig(HOST_CHECKING_KEY, HOST_CHECKING_VALUE)
+                }
 
     }
 

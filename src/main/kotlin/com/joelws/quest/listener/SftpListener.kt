@@ -27,35 +27,36 @@ import com.joelws.quest.handler.UnzipHandler
 import org.slf4j.LoggerFactory
 import rx.lang.kotlin.single
 import rx.schedulers.Schedulers
+import java.io.File
 
-class ZipListener(private val sftpOperation: SftpOperation,
-                  private val workingDir: String,
-                  private val zipHandler: UnzipHandler,
-                  private val mavenUploadHandler: MavenUploadHandler) : DirectoryListener {
+class SftpListener(private val sftpOperation: SftpOperation,
+                   private val workingDir: String,
+                   private val zipHandler: UnzipHandler,
+                   private val mavenUploadHandler: MavenUploadHandler) : DirectoryListener {
 
-    private val logger = LoggerFactory.getLogger(ZipListener::class.java)
+    private val logger = LoggerFactory
+            .getLogger(SftpListener::class.java)
 
     override fun fileModified(event: FileModifiedEvent) {
-
     }
 
     override fun fileRemoved(event: FileRemovedEvent) {
 
-    }
-
-    override fun fileAdded(event: FileAddedEvent) {
-
         logger.info("We decide to go down a different path...")
 
-        val fileName = event.fileElement.name.removeSuffix(".antivirus.scanning")
+        val fileName = event
+                .fileElement
+                .name
+                .removeSuffix(".antivirus.scanning")
 
         logger.info("Found a file on the way: $fileName")
 
-        val absoluteName = "$workingDir/$fileName"
+        val absoluteName = "$workingDir${File::separator}$fileName"
 
-        val tempDirFileName = "$TEMP_DIR/$fileName"
+        val tempDirFileName = "$TEMP_DIR${File::separator}$fileName"
 
-        val mavenUploadSubscription = single<Unit> {
+        single<Unit> {
+
             logger.info("Starting download of $fileName to directory[$TEMP_DIR]")
 
             sftpOperation.get(absoluteName, tempDirFileName)
@@ -64,14 +65,46 @@ class ZipListener(private val sftpOperation: SftpOperation,
 
             zipHandler.execute(tempDirFileName)
 
-            mavenUploadHandler.execute(tempDirFileName)
+            if (mavenUploadHandler.execute(fileName)) {
+
+                logger.info("artefacts have been uploaded successfully!")
+
+                notifySftp("${fileName}_HAS_SUCCEEDED")
+
+            } else {
+
+                logger.error("Artefacts have not been uploaded")
+
+                notifySftp("${fileName}_HAS_FAILED")
+
+            }
 
         }.subscribeOn(Schedulers.io()).subscribe(
                 { logger.info("Task completed, continuing...") },
                 { e -> logger.error("Task encountered error: ", e) }
         )
 
-
     }
 
+    override fun fileAdded(event: FileAddedEvent) {
+    }
+
+    private fun notifySftp(notificationFileName: String) {
+
+        val tempNotificationFileName = "$TEMP_DIR${File::separator}$notificationFileName"
+
+        var tempNotificationFile: File? = null
+
+        try {
+            tempNotificationFile = File(tempNotificationFileName)
+
+            tempNotificationFile.createNewFile()
+
+            sftpOperation.put(tempNotificationFile.absolutePath, "$workingDir${File::separator}$notificationFileName")
+
+        } finally {
+            tempNotificationFile?.delete()
+        }
+
+    }
 }

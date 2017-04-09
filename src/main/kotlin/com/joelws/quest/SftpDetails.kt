@@ -16,4 +16,8 @@ limitations under the License.
 
 package com.joelws.quest
 
-data class SftpDetails(val host: String, val userName: String, val password: String)
+data class SftpDetails(
+        val host: String,
+        val userName: String,
+        val password: String
+)

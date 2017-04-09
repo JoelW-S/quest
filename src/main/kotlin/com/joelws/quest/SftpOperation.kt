@@ -34,11 +34,16 @@ class SftpOperation(private val details: SftpDetails,
         try {
 
             @Suppress("UNCHECKED_CAST")
-            val listOfFiles = channel.ls(workingDirectory) as Vector<ChannelSftp.LsEntry>
-            return listOfFiles.map { SftpFile(it) }.toSet()
+            val listOfFiles = channel
+                    .ls(workingDirectory) as Vector<ChannelSftp.LsEntry>
+            return listOfFiles
+                    .map(::SftpFile)
+                    .toSet()
 
         } finally {
-            channel.session.disconnect()
+            channel
+                    .session
+                    .disconnect()
         }
     }
 
@@ -56,14 +61,34 @@ class SftpOperation(private val details: SftpDetails,
             logger.error("Failed to write file: ", e)
         } finally {
             fos?.close()
-            channel.session.disconnect()
+
+            channel
+                    .session
+                    .disconnect()
         }
 
     }
 
+    fun put(src: String, dest: String) {
+        val channel = getChannel()
+
+        try {
+            channel.put(src, dest)
+        } finally {
+            channel
+                    .session
+                    .disconnect()
+        }
+    }
+
     private fun getChannel(): ChannelSftp {
-        val session = this.sftpSession.getSession(details.host, details.userName, details.password)
-        return sftpSession.getChannelSftp(session)
+        val session = this.sftpSession.getSession(
+                details.host,
+                details.userName,
+                details.password
+        )
+        return sftpSession
+                .getChannelSftp(session)
     }
 
 }

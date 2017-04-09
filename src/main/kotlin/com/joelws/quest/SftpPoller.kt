@@ -20,7 +20,7 @@ import com.github.drapostolos.rdp4j.DirectoryPoller
 import com.github.drapostolos.rdp4j.RegexFileFilter
 import com.joelws.quest.handler.MavenUploadHandler
 import com.joelws.quest.handler.UnzipHandler
-import com.joelws.quest.listener.ZipListener
+import com.joelws.quest.listener.SftpListener
 import java.util.concurrent.TimeUnit
 
 object SftpPoller {
@@ -41,9 +41,16 @@ object SftpPoller {
 
         val polledDirectory = SftpDirectory(root, workingDir)
 
-        DirectoryPoller.newBuilder()
+        DirectoryPoller
+                .newBuilder()
                 .addPolledDirectory(polledDirectory)
-                .addListener(ZipListener(root, workingDir, UnzipHandler, MavenUploadHandler))
+                .addListener(
+                        SftpListener(
+                                root,
+                                workingDir,
+                                UnzipHandler,
+                                MavenUploadHandler
+                        ))
                 .setPollingInterval(POLLING_INTERVAL, TimeUnit.SECONDS)
                 .setDefaultFileFilter(RegexFileFilter(ZIP_SUFFIX))
                 .start()

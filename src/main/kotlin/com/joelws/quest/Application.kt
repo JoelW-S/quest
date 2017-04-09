@@ -24,12 +24,17 @@ object Application {
 
     @JvmStatic
     fun main(args: Array<String>) {
+
         logger.info("Starting quest")
 
         try {
-            SftpPoller.bootstrap()
+            SftpPoller
+                    .bootstrap()
+
         } catch (e: Exception) {
+
             logger.error("Encountered error, Shutting down: ", e)
+
             System.exit(1)
         }
     }

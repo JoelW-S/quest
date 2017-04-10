@@ -42,7 +42,7 @@ object MavenUploadHandler : Handler<String, Boolean> {
         if (matcher.matches()) {
             val folderName = matcher.group(1)
 
-            val mavenScriptPath = "${TEMP_DIR}${File::separator}$folderName${File::separator}mvn_upload_$folderName.sh"
+            val mavenScriptPath = "${TEMP_DIR}/$folderName/mvn_upload_$folderName.sh"
 
             val mavenScript = File(mavenScriptPath)
 

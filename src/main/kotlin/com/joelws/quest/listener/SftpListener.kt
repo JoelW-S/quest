@@ -51,9 +51,9 @@ class SftpListener(private val sftpOperation: SftpOperation,
 
         logger.info("Found a file on the way: $fileName")
 
-        val absoluteName = "$workingDir${File::separator}$fileName"
+        val absoluteName = "$workingDir/$fileName"
 
-        val tempDirFileName = "$TEMP_DIR${File::separator}$fileName"
+        val tempDirFileName = "$TEMP_DIR$/$fileName"
 
         single<Unit> {
 
@@ -91,7 +91,7 @@ class SftpListener(private val sftpOperation: SftpOperation,
 
     private fun notifySftp(notificationFileName: String) {
 
-        val tempNotificationFileName = "$TEMP_DIR${File::separator}$notificationFileName"
+        val tempNotificationFileName = "$TEMP_DIR/$notificationFileName"
 
         var tempNotificationFile: File? = null
 
@@ -100,7 +100,7 @@ class SftpListener(private val sftpOperation: SftpOperation,
 
             tempNotificationFile.createNewFile()
 
-            sftpOperation.put(tempNotificationFile.absolutePath, "$workingDir${File::separator}$notificationFileName")
+            sftpOperation.put(tempNotificationFile.absolutePath, "$workingDir/$notificationFileName")
 
         } finally {
             tempNotificationFile?.delete()
